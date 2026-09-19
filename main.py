@@ -38,6 +38,7 @@ def create_user_dict(details:dict):
     }
 
 # use pydanic for data validation
+#  below is schema
 class User(BaseModel):
     name:str
     age:int
@@ -48,4 +49,17 @@ def create_user_dict(details:User):
         "success":"true",
         "data":details
     }
-
+# below is nested schema
+class Address(BaseModel):
+    city:str
+    pincode:int
+class User(BaseModel):
+    name:str
+    age:int
+    address:Address
+@app.post("/create-user-nest")
+def create_user_dict(details:User):
+    return {
+        "success":"true",
+        "data":details
+    }
