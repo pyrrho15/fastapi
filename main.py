@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
+import sqlite3
 
 app = FastAPI();
 
@@ -105,3 +106,22 @@ def delete_todo(id:int):
             return {"msg":"deleted"}
         else:
             return {"error":"todo not found"}
+
+
+# Connect sqliteDB
+conn = sqlite3.connect("test.db", check_same_thread=False)
+cursor=conn.cursor()
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS todos (
+    id INTEGER PRIMARY KEY,
+    title TEXT,
+    completed TEXT
+)
+""")
+conn.commit()
+
+@app.get("/")
+def home():
+    return{
+        "message": "SQLite Connected fine"
+    }
