@@ -26,8 +26,55 @@ def get_db():
     finally:
         db.close()
     
-@app.get("/")
-def home(db:Session=Depends(get_db)):
+# CREATE
+@app.post("/create_todo")
+def create_todo(title:str,db:Session = Depends(get_db)):
+    todo = Todo(title=title, completed="False")
+    db.add(todo)
+    db.commit()
+    db.refresh(todo)
     return{
-        "message":"DB CONNECTED"
+        "message":"Todo Created",
+        "data":todo
     }
+
+# READ
+@app.get("/todos")
+def get_todos(db:Session = Depends(get_db)):
+    todos = db.query(Todo).all()
+
+    return {
+        "total":len(todos),
+        "data":todos
+    }
+
+@app.get("/todos/{id}")
+def get_todo_id(db:Session=Depends(get_db), id=int):
+
+    todo = db.query(Todo).filter(Todo.id == id).first()
+    
+    return {"data":todo}
+
+# UPDATE
+@app.put("/todos/{id}")
+def get_todo_id(title:str, id:int,db:Session=Depends(get_db)):
+
+    todo = db.query(Todo).filter(Todo.id == id).first()
+
+    todo.title = title
+
+    db.commit()
+    db.refresh(todo)
+    
+    return {"data":todo}
+
+# DELETE
+@app.delete("/todos/{id}")
+def get_todo_id(id:int,db:Session=Depends(get_db)):
+
+    todo = db.query(Todo).filter(Todo.id == id).first()
+
+    db.delete(todo)
+    db.commit()
+    
+    return {"data":todo}
